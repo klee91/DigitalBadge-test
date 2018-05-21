@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 
 
-const Badge = () => {
+const Badge = (props) => {
     return (
         <div></div>
     )

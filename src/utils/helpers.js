@@ -1,8 +1,50 @@
 // Include the axios package for performing HTTP requests (promise based alternative to request)
-// var axios = require("axios");
-
+const axios = require("axios");
+const params = new URLSearchParams();
+params
 // Helper functions for making API Calls
-var helper = {
+const helpers = {
+    addUser: user => {
+        return axios.post('/api/signup', {
+            user,
+            headers:{'Content-Type' : 'application/json'},
+            validateStatus: (status) => {
+                return true;
+            }
+        }).then(res => {
+            console.log("RES:" + res);
+        }).catch(error => {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+              } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                console.log(error.request);
+              } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error: ', error.message);
+              }
+              console.log(error.config);  
+        });
+    }
+    // loginUser: user => {
+    //     return axios.post('/api/login', {
+    //         user,
+    //         headers:{'Content-Type' : 'application/x-www-form-urlencoded'},
+    //         validateStatus: status => {
+    //             return true;
+    //         }
+    //     }).then(res =>{
+    //         console.log("RES: " + res)
+    //     }).catch(error =>{
+    //         console.log("loginUser error: " + error);
+    //     });
+    // }
 //   addContact: function(userID,contactID) {
 //     return axios.post('/api/newContact/' + userID + "/" + contactID);
 //   },
@@ -50,50 +92,6 @@ var helper = {
 //   getUserById: function(id) {
 //     return axios.get("/api/userContacts/" + id);
 //   },
-//   // This function serves our purpose of running the query to geolocate.
-//   runQuery: function(location, newUser) {
-    
-//     // Figure out the geolocation
-//     var queryURL = "https://api.opencagedata.com/geocode/v1/json?query=" + location + "&pretty=1&key=" + geocodeAPI;
-//     var returnObj = {}
-//     returnObj.user = newUser;
-
-//     return axios.get(queryURL).then(function(response) {
-      
-//       // If get get a result, return that result's formatted address property
-//       if (response.data.results[0]) {
-//         returnObj.lat = response.data.results[0].geometry.lat;
-//         returnObj.lng = response.data.results[0].geometry.lng;
-//         return returnObj;
-//       }
-//       // If we don't get any results, return an empty string
-//       return "";
-//     });
-//   },
-//   runQueryEvents: function(query,lat,lng,startDate,endDate,radius) {
-
-//     var newQ = query.replace(/\s/g, '+');
-//     //encode params for URL
-    
-//     var queryURL = 'https://www.eventbriteapi.com/v3/events/search/?' + 
-//     'q=' + newQ +
-//     '&location.within=' + radius + 
-//     '&location.latitude=' + lat.toString() +
-//     '&location.longitude=' + lng.toString() +
-//     '&start_date.range_start=' + startDate + 'T01:00:00'+ 
-//     '&start_date.range_end=' + endDate + 'T23:00:00'+
-//      '&token=ZOVDW3APCGKQD5SCX75S';
-    
-//     return axios.get(queryURL, function(err,data) {
-
-//       if (err) {
-//         console.log(err);
-//       }
-//       console.log(data)
-      
-//     });
-
-//   },
 //   // This function hits our own server to retrieve the record of query results
 //   getHistory: function() {
 //     return axios.get("/api");
@@ -104,4 +102,4 @@ var helper = {
 //   }
 };
 
-module.exports = helper;
+module.exports = helpers;

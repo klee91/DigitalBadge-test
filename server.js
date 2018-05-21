@@ -9,13 +9,26 @@
 // Server Dependencies
 const express = require("express");
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 const morgan = require("morgan");
 const mongoose = require("mongoose");
-const jwt = require('express-jwt');
-const jwks = require('jwks-rsa');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const flash = require('connect-flash');
+const nconf = require('nconf');
+
 const app = express();
 const router = express.Router();
 const PORT = process.env.PORT || 3000;
+const VerifyToken = require('./auth/VerifyToken.js');
+const config = require('./config.js');
+
+const StudentData = require("./src/models/StudentSchema.js");
+const TeacherData = require("./src/models/TeacherSchema.js");
+require('./auth/passport.js');
+const apiRoutes = require('./routes/apiroutes.js');
 
 // create a write stream (in append mode)
 // var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), {flags: 'a'})
@@ -27,6 +40,19 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.text());
 app.use(bodyParser.json({ type: "application/vnd.api+json" }));
+
+// nconf.argv().env().file({file: './config.js'});
+
+app.use(cookieParser(config.OREO));
+
+//Connect Flash
+app.use(flash());
+// app.use((req,res) => {
+//     res.locals.success_msg = req.flash('success_msg');
+//     res.locals.error_msg = req.flash('error_msg');
+//     res.locals.error = req.flash('error');
+//     next();
+// });
 
 //To prevent errors from Cross Origin Resource Sharing, we will set 
 //our headers to allow CORS with middleware like so:
@@ -40,33 +66,19 @@ app.use(function(req, res, next) {
     next();
 });
 
-// ==================== JWT AUTHENTICATION ====================
-const authCheck = jwt({
-    secret: jwks.expressJwtSecret({
-          cache: true,
-          rateLimit: true,
-          jwksRequestsPerMinute: 5,
-          // YOUR-AUTH0-DOMAIN name e.g prosper.auth0.com
-          jwksUri: "https://{YOUR-AUTH0-DOMAIN}/.well-known/jwks.json"
-      }),
-      // This is the identifier we set when we created the API
-      audience: '{YOUR-API-AUDIENCE-ATTRIBUTE}',
-      issuer: '{YOUR-AUTH0-DOMAIN}',
-      algorithms: ['RS256']
-});
+app.use(passport.initialize());
+app.use(passport.session());
 
 // ==================== MONGODB SETUP ====================
-mongoose.connect('mongodb://localhost/eisenhowerDB');
+// mongoose.connect('mongodb://localhost/eisenhowerDB');
+mongoose.connect('mongodb://admin:dbdbdeep@ds119350.mlab.com:19350/eisenhower');
 
 let db = mongoose.connection;
 
 //Check for MongoDB errors...
-db.on('error', function(err) {
-    console.log(err);
+db.on('error', function(error) {
+    console.log(error);
 });
-
-const StudentData = require("./src/models/StudentSchema.js");
-const TeacherData = require("./src/models/TeacherSchema.js")
 
 // ==================== SERVER ROUTES ====================
 app.get('/', function (req, res) {
@@ -74,6 +86,10 @@ app.get('/', function (req, res) {
 });
 
 app.get('/get', function (req, res) {
+    res.sendFile(__dirname + "/public/index.html");
+});
+
+app.get('/login', function(req,res) {
     res.sendFile(__dirname + "/public/index.html");
 });
 
@@ -93,99 +109,14 @@ app.get('/teachers/:teacherId', function(req,res) {
     res.sendFile(__dirname + "/public/index.html");
 });
 
-// router.get('/get-data', function(req,res) {
-//     StudentData.find()
-//         .then(function() {
-//             res.render('index', {items:doc});
-//         })
-// })
-
-// router.post('/insert', function(req,res) {
-//     const item = {
-//         firstName: req.body.firstName,
-//         lastName: req.body.lastName,
-//         age: req.body.age
-//     };
-
-//     const data = new StudentData(item);
-//     data.save();
-
-//     res.redirect('/');
-// })
-
-// router.post('/update', function(req,res) {
-//     const item = {
-//         firstName: req.body.firstName,
-//         lastName: req.body.lastName,
-//         age: req.body.age
-//     };
-//     const id = req.body.id;
-
-//     StudentData.findById(id, function(err,doc) {
-//       if(error) {
-//           console.error('error')
-//       } 
-//       doc.firstName= req.body.firstName;
-      
-//       doc.save();
-//     });
-// })
-
-// router.post('/delete', function(req,res) {
-//     const id = req.body.id;
-//     StudentData.findByIdAndRemove(id).exec();
-// });
-
-// ==================== API ROUTES ====================
-app.use('/api', router);
+app.use('/api', apiRoutes);
 // app.use(express.static(path.resolve('./public')));
-
-router.get('/', function(req, res) {
-    res.json({ message: 'API Initialized!'});
-});
-
-router.get('/students', function(req,res) {
-    StudentData.find()
-    .then(function(data) {
-        res.json(data);
-        console.log(data);
-    });
-});
-
-router.get('/students/:studentId', function(req,res) {
-    StudentData.find({
-        "studentId" : parseInt(req.params.studentId)
-    })
-    .then(function(data) {
-        res.json(data);
-        console.log(data);
-    });
-});
-
-router.get('/teachers', function(req,res) {
-    TeacherData.find()
-    .then(function(data) {
-        res.json(data);
-        console.log(data);
-    });
-});
-
-router.get('/teachers/:teacherId', function(req,res) {
-    console.log(req.params.teacherId);
-    TeacherData.find({
-        "teacherId" : parseInt(req.params.teacherId)
-    })
-    .then(function(data) {
-        res.json(data);
-        console.log(data);
-    });
-});
 
 //==========================================================
 //On successful connection...
-db.once('open', function() {
+db.once('open', () => {
     console.log('Mongo connection successful');
-    app.listen(PORT,function() {
+    app.listen(PORT, () => {
         console.log("App is listening on PORT " + PORT);
     });
 });

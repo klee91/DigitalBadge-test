@@ -22,7 +22,20 @@
   font-size: large;
 }
 
-/* @keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-} */
+#login-signup-prompt form {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  text-align: left;
+  padding: 1em 5em;
+}
+#dashboard {
+  width: 25%;
+}
+#view {
+  width: 75%;
+}
+#main {
+  display: grid;
+  
+}
