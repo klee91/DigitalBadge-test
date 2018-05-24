@@ -1,11 +1,17 @@
 import React, {Component} from 'react';
-import { Link } from 'react-router-dom';
 
 class Home extends Component {
     render() {
         return(
             <div id="home">
-                Welcome 
+                <h1 className="page-title">Welcome to Eisenhower Middle School</h1>
+                <hr />
+                <section>
+                    <h3 className="subtitle">Announcements</h3>
+                </section>
+                <div className="container">
+
+                </div>
             </div>
         )
     }

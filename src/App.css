@@ -1,41 +1,175 @@
+
+
 .App {
-  text-align: center;
+  text-align: left;
 }
 
 .App-logo {
   /* animation: App-logo-spin infinite 20s linear; */
-  height: 80px;
+  height: 70px;
 }
 
 .App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
+  height: 125px;
+  padding: 15px;
   color: white;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  background-color: rgb(0, 0, 0.39);
+}
+
+.App-header * {
+  margin: 5px;
 }
 
 .App-title {
   font-size: 1.5em;
+  padding-top: 5px;
 }
 
 .App-intro {
   font-size: large;
 }
+#view {
+  grid-area: view;
+  display: grid;
+}
+#main {
+  display: grid;
+  grid-template-columns: [dashboard] 1fr [view] 6fr;
+  grid-template-rows: auto;
+}
 
-#login-signup-prompt form {
+/******************************** Login/Sign Up ********************************/
+#login-signup-prompt{
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr [middle] 3fr 1fr;
+  grid-template-rows: 1fr [middle] 3fr 1fr;
+  background-color: #243B4A;
+}
+#loginOrSignup {
+  grid-area: middle;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-content: center;
+  padding: 30px;
+  border: solid 2px #e8e8e8;
+  border-radius: 15px;
+  -webkit-border-radius: 15px;
+  -moz-border-radius: 15px;
+  -ms-border-radius: 15px;
+  -o-border-radius: 15px;
+  background-color: #FFFFFF;
+  box-shadow: 0px 0px 11px #222;
+}
+#loginOrSignup > h1 {
+  margin: 0px 0px 25px;
+  text-align: center;
+}
+#btnWrapper {
+  display: block;
+  margin: 0 auto;
+}
+#btnWrapper button {
+  text-transform: uppercase;
+  font-size: 1.15rem;
+  margin: 0px 5px;
+  padding: 0.65rem 1.75rem;
+  border-radius:  1.5rem;
+  -webkit-border-radius:  1.5rem;
+  -moz-border-radius:  1.5rem;
+  -ms-border-radius:  1.5rem;
+  -o-border-radius:  1.5rem;
+}
+.btnFormWrapper button {
+  margin: 5px;
+  text-transform: uppercase;
+  padding: 0.65rem 1.75rem;
+}
+.btnFormWrapper button:hover {
+  color: #FFFFFF;
+  background-color: #707070;
+} 
+#loginForm, #signupForm {
+  grid-area: middle;
+  padding: 30px;
+  border: solid 2px #e8e8e8;
+  border-radius: 15px;
+  -webkit-border-radius: 15px;
+  -moz-border-radius: 15px;
+  -ms-border-radius: 15px;
+  -o-border-radius: 15px;
+  background-color: #FFFFFF;
+  box-shadow: 0px 0px 11px #222;
+}
+#loginForm form {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  margin-top: 100px;
+  text-align: left;
+  padding: 1em 5em;
+}
+#signupForm form {
+
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;
   text-align: left;
   padding: 1em 5em;
 }
+.formTitle {
+  margin-bottom: 1.5rem;
+}
+/******************************** Dashboard ********************************/
 #dashboard {
-  width: 25%;
+  /* width: 15%;
+  min-width: 150px; */
+  grid-area: dashboard;
+  min-height: 100vh;
+  height: 100%;
+  background-color: #222;
+  overflow: hidden;
 }
-#view {
-  width: 75%;
+#dashboardLinks {
+  list-style-type: none;
+  text-align:left;
+  padding-left: 0;
 }
-#main {
-  display: grid;
-  
+#dashboardLinks li {
+  color: white;
+  padding: 15px;
+  background-color: #222222;
+  transition: all 0.1s ease-in;
+  -webkit-transition: all 0.1s ease-in;
+  -moz-transition: all 0.1s ease-in;
+  -ms-transition: all 0.1s ease-in;
+  -o-transition: all 0.1s ease-in;
+}
+#dashboardLinks li:hover {
+  background-color: rgb(46, 46, 46);
+}
+#dashboardLinks a:hover {
+  text-decoration: none;
+}
+
+/******************************** Home ********************************/
+#home {
+  text-align: left;
+}
+.page-title, .subtitle {
+  padding: 30px 15px 15px 30px;
+}
+
+.studentWrapper {
+  display: flex;
+  flex-flow: column nowrap;
+  margin: 15px 0px;
+}
+.studentWrapper p {
+  margin-bottom: 0rem;
+  padding: 0px;
 }

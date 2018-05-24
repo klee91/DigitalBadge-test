@@ -3,7 +3,7 @@
 //    - https://stackoverflow.com/questions/15772394/how-to-upload-display-and-save-images-using-node-js-and-express
 // 2. JWT Token Authentication
 // 3. Express Client Side + API Routing
-
+// 4. added functionality for secret code between teachers to verify the user signup
 'use strict';
 
 // Server Dependencies
@@ -21,7 +21,7 @@ const nconf = require('nconf');
 
 const app = express();
 const router = express.Router();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 const VerifyToken = require('./auth/VerifyToken.js');
 const config = require('./config.js');
 
@@ -66,6 +66,7 @@ app.use(function(req, res, next) {
     next();
 });
 
+//initiate passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -85,15 +86,35 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + "/public/index.html");
 });
 
+app.get('/home', function (req, res) {
+    res.sendFile(__dirname + "/public/index.html");
+});
+
+app.get('/home/profile', function (req, res) {
+    res.sendFile(__dirname + "/public/index.html");
+});
+
+app.get('/home/badges', function (req, res) {
+    res.sendFile(__dirname + "/public/index.html");
+});
+app.get('/home/students', function(req,res) {
+    res.sendFile(__dirname + "/public/index.html");
+});
+app.get('/logout', function (req, res) {
+    // console.log('logout route hit');
+    // req.session.destroy(function (err) {
+    //     res.clearCookie('act');
+    //     res.clearCookie('user_id');
+    //     res.redirect('/');
+    // });
+    res.sendFile(__dirname + "/public/index.html");
+});
+
 app.get('/get', function (req, res) {
     res.sendFile(__dirname + "/public/index.html");
 });
 
 app.get('/login', function(req,res) {
-    res.sendFile(__dirname + "/public/index.html");
-});
-
-app.get('/students', function(req,res) {
     res.sendFile(__dirname + "/public/index.html");
 });
 

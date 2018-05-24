@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import logo from './assets/img/digibadge.jpg';
+import logo from './assets/img/db-logo-prototype.png';
 import LoginSignup from './components/Login-Signup.js';
 import cookies from 'react-cookie';
 import Main from './components/Main.js';
+import {Route} from 'react-router-dom';
 import './App.css';
 
 class App extends Component {
@@ -15,10 +16,12 @@ class App extends Component {
     }
   }
   componentWillMount() {
-    if(cookies !== undefined) {
-        let authcookie = cookies.load('act');
+    let authcookie = cookies.load('act');
+    if(authcookie) {
         console.log(authcookie);
         this.setState({isAuthenticated : true});
+    } else {
+      this.setState({isAuthenticated : false});
     }
   }
   render() {
@@ -26,11 +29,17 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Eisenhower Middle School - Digital Badge</h1>
+          <h1 className="App-title">Eisenhower Middle School</h1>
         </header>
         <div>
-          <h1>Welcome to the Eisenhower Middle School</h1> 
-          { this.state.isAuthenticated === true ? <Main /> : <LoginSignup /> }
+          <Route path='/' render={() => (
+            this.state.isAuthenticated ? (
+                <Main />
+            ) : (
+                <LoginSignup isAuthenticated={this.state.isAuthenticated}/>
+            )
+          )}/>
+          {/* {this.state.isAuthenticated === true ? <Main /> : <LoginSignup isAuthenticated={this.state.isAuthenticated}/> } */}
         </div>
       </div>
     );

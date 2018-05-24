@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import helpers from '../utils/helpers.js';
 import axios from 'axios';
+import cookies from 'react-cookie';
 class LoginSignup extends Component {
     constructor(props) {
         super(props);
@@ -14,8 +15,7 @@ class LoginSignup extends Component {
             isTeacher: false,
             password: '',
             loginemail: '',
-            loginpassword: '',
-            isAuthenticated: false
+            loginpassword: ''
         }
         //'this' bindings for event handlers
         this.handleLogin = this.handleLogin.bind(this);
@@ -28,7 +28,8 @@ class LoginSignup extends Component {
     }
     componentDidMount() {
         //if user has act cookie, automatically authenticate and log in
-        console.log(this.state.isAuthenticated);
+        console.log('from parent: ' + this.props.isAuthenticated);
+        console.log('from current: ' + this.state.isAuthenticated);
     }
     handleChange = event => {
         let change = {};
@@ -40,34 +41,43 @@ class LoginSignup extends Component {
         const name = event.target.name;
 
         this.setState({
-        [name]: value
+            [name]: value
         });
         // if(event.target.value == )
         // this.setState({
         //     event.target.name = ;
         // })
     }
-    handleSignup = event =>{
+    handleSignup = async event => {
         event.preventDefault();
-        console.log(this.state);
-        helpers.addUser(this.state);
+        await helpers.addUser(this.state);
+        window.location.replace("/home");
+        return false;
     }
     handleLogin = event => {
         event.preventDefault();
+
         let user = {
-            email: this.state.loginemail,
-            password: this.state.loginpassword
+            loginemail: this.state.loginemail,
+            loginpassword: this.state.loginpassword
         };
+        // let act = cookies.load('act');
         axios.post('/api/login', {
             user,
-            headers:{'Content-Type' : 'application/x-www-form-urlencoded'},
+            headers:{
+                'Content-Type' : 'application/x-www-form-urlencoded'
+                // 'x-access-token' : cookies.load('act'),
+            },
+            // Cookie: "act=" + act,
+            withCredentials:true,
             validateStatus: status => {
                 return true;
             }
-        }).then(res =>{
-            console.log("RES: " + res);
-            this.setState({isAuthenticated: true});
-        }).catch(error =>{
+        }).then (res => {
+            console.dir( res);
+            //********************************************** set state to parent component
+            // this.setState({isAuthenticated: true});
+        }).catch (error => {
             console.log("loginUser error: " + error);
         });
     }
@@ -91,55 +101,75 @@ class LoginSignup extends Component {
             <div id="login-signup-prompt">
                 {/* display initial signup or login */}
                 {!this.state.displayLogin && !this.state.displaySignup ?
-                <div>
-                    <h1>Login or Signup</h1>
-                    <button name="loginbtn" onClick={this.handleLoginClick}>Login</button>
-                    <button name="signupbtn" onClick={this.handleSignupClick}>Signup</button>
+                <div id="loginOrSignup" className="container">
+                    <h1>Login or Sign Up</h1>
+                    <div id="btnWrapper">
+                        <button name="loginbtn" id="loginBtn" type="button" className="btn btn-outline-info" onClick={this.handleLoginClick}>Login</button>
+                        <button name="signupbtn" id="signupBtn" type="button" className="btn btn-info" onClick={this.handleSignupClick}>Sign Up</button>
+                    </div>
                 </div>
                 : this.state.displayLogin ? 
-                <div>
+                <div id="loginForm">
                     {/* Login Prompt */}
                     <form onSubmit={this.handleLogin} method="get">
-                        <label htmlFor="loginemail">E-mail:</label>
-                        <input name="loginemail" type="text"/>
-                        <label htmlFor="loginpassword">Password:</label>
-                        <input name="loginpassword" type="password"/>
-                    
-                        <button type="submit">Login</button>
+                        <h2 className="formTitle">Login</h2>
+                        <div className="form-group">
+                            <input name="loginemail" id="loginemail" type="text" className="form-control form-control-lg" placeholder="Enter Email" onChange={this.handleChange}/>
+                        </div>
+                        <div className="form-group">
+                            <input name="loginpassword" id="loginpassword" type="password" className="form-control form-control-lg" placeholder="Enter Password" onChange={this.handleChange}/>
+                        </div>
+                        <div className="btnFormWrapper">
+                            <button type="submit" className="btn">Login</button>
+                            <button type="button" onClick={this.handleBack} className="btn">Back</button>
+                        </div>
                     </form>
-                    <button onClick={this.handleBack}>Back</button>
                 </div> 
                 : this.state.displaySignup ? 
-                <div>
+                <div id="signupForm">
                     {/* Signup Prompt */}
                     <form onSubmit={this.handleSignup} method="post">
-                        <label htmlFor="firstName">First Name:</label>
-                        <input name="firstName" type="text" onChange={this.handleChange}/>
-                        <label htmlFor="lastName">Last Name:</label>
-                        <input name="lastName" type="text" onChange={this.handleChange}/>
-                        <label htmlFor="email">Email:</label>
-                        <input name="email" type="text" onChange={this.handleChange}/>
+                        <h2 className="formTitle">Sign Up</h2>
+                        <div className="form-group">
+                            <input className="form-control" id="firstName" name="firstName" type="text" onChange={this.handleChange} placeholder="First Name"/>
+                        </div>
+                        <div className="form-group">
+                            <input className="form-control" id="lastName" name="lastName" type="text" onChange={this.handleChange} placeholder="Last Name"/>
+                        </div>
+                        <div className="form-group">
+                            <input className="form-control" id="email" name="email" type="text" onChange={this.handleChange} placeholder="Email"/>
+                        </div>
                         <div className="form-group">
                             <div>I am a...</div>
-                            <label htmlFor="student">Student</label>
-                            <input name="isStudent" type="checkbox" checked={this.state.isStudent} onChange={this.handleUserChange}/>
-                            <label htmlFor="student">Teacher</label>
-                            <input name="isTeacher" type="checkbox" checked={this.state.isTeacher} onChange={this.handleUserChange}/>
+                            <div className="form-check">
+                                <input className="form-check-input" id="isStudent" name="isStudent" type="checkbox" checked={this.state.isStudent} onChange={this.handleUserChange}/>
+                                <label className="form-check-label" htmlFor="student">Student</label>
+                            </div>
+                            <div className="form-check">
+                                <input className="form-check-input" id="isTeacher" name="isTeacher" type="checkbox" checked={this.state.isTeacher} onChange={this.handleUserChange}/>
+                                <label className="form-check-label" htmlFor="student">Teacher</label>
+                            </div>
                         </div>
-                        <label htmlFor="password">Password:</label>
-                        <input name="password" type="password" onChange={this.handleChange}/>
-                        <label htmlFor="confirmpass">Confirm Password:</label>
-                        <input name="confirmpass" type="password" onChange={this.handleChange}/>
-                        <button type="submit">Signup</button>
-                        <button onClick={this.handleBack}>Back</button>
+                        <div className="form-group">
+                            <input className="form-control" id="password" name="password" type="password" onChange={this.handleChange} placeholder="Password"/>
+                        </div>
+                        <div className="form-group">
+                            <input className="form-control" id="confirmpass" name="confirmpass" type="password" onChange={this.handleChange} placeholder="Confirm Password"/>
+                        </div>
+                        <div className="btnFormWrapper">
+                            <button type="submit" className="btn">Signup</button>
+                            <button onClick={this.handleBack} className="btn">Back</button>
+                        </div>
                     </form>
                 </div> 
                 : 
                 // Initial Login/Signup Prompt
-                <div>
-                    <h1>Login or Signup</h1>                
-                    <button name="loginbtn" onClick={this.handleLoginClick}>Login</button>
-                    <button name="signupbtn" onClick={this.handleSignupClick}>Signup</button>
+                <div id="loginOrSignup" className="container">
+                    <h1>Login or Sign Up</h1>
+                    <div id="btnWrapper">
+                        <button name="loginbtn" id="loginBtn" type="button" className="btn btn-outline-info" onClick={this.handleLoginClick}>Login</button>
+                        <button name="signupbtn" id="signupBtn" type="button" className="btn btn-info" onClick={this.handleSignupClick}>Sign Up</button>
+                    </div>
                 </div>
                 }
             </div>

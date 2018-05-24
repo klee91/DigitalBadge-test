@@ -1,7 +1,7 @@
 // Include the axios package for performing HTTP requests (promise based alternative to request)
 const axios = require("axios");
-const params = new URLSearchParams();
-params
+// const params = new URLSearchParams();
+
 // Helper functions for making API Calls
 const helpers = {
     addUser: user => {
@@ -12,7 +12,7 @@ const helpers = {
                 return true;
             }
         }).then(res => {
-            console.log("RES:" + res);
+
         }).catch(error => {
             if (error.response) {
                 // The request was made and the server responded with a status code
@@ -31,6 +31,99 @@ const helpers = {
               }
               console.log(error.config);  
         });
+    },
+    getStudents: () => {
+        return axios.get('/api/students')
+        .then(response => {
+            return response.data;
+        }).catch(error => {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+              } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                console.log(error.request);
+              } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error: ', error.message);
+              }
+              console.log(error.config); 
+        });
+    },
+    getStudent: () => {
+        return axios.get('/api/student/me', (error, student) => {
+            return student;
+        }).catch(error => {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+              } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                console.log(error.request);
+              } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error: ', error.message);
+              }
+              console.log(error.config); 
+        });
+    },
+    getTeachers: () => {
+        return axios.get('/api/teachers')
+        .then(response => {
+            return response.data;
+        }).catch(error => {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+              } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                console.log(error.request);
+              } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error: ', error.message);
+              }
+              console.log(error.config); 
+        });
+    },
+    getTeacher: () => {
+        return axios.get('/api/teacher/me', (error, teacher) => {
+            return teacher;
+        }).catch(error => {
+            if (error.response) {
+                // The request was made and the server responded with a status code
+                // that falls out of the range of 2xx
+                console.log(error.response.data);
+                console.log(error.response.status);
+                console.log(error.response.headers);
+              } else if (error.request) {
+                // The request was made but no response was received
+                // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+                // http.ClientRequest in node.js
+                console.log(error.request);
+              } else {
+                // Something happened in setting up the request that triggered an Error
+                console.log('Error: ', error.message);
+              }
+              console.log(error.config); 
+        });
+    },
+    logoutUser: () => {
+        return axios.post('/api/logout');
     }
     // loginUser: user => {
     //     return axios.post('/api/login', {
