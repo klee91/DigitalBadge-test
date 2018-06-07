@@ -4,6 +4,7 @@
 // 2. JWT Token Authentication
 // 3. Express Client Side + API Routing
 // 4. added functionality for secret code between teachers to verify the user signup
+// 5. React Router (Client-side Routing)
 'use strict';
 
 // Server Dependencies
@@ -21,7 +22,7 @@ const nconf = require('nconf');
 
 const app = express();
 const router = express.Router();
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 7000;
 const VerifyToken = require('./auth/VerifyToken.js');
 const config = require('./config.js');
 

@@ -12,7 +12,7 @@ const helpers = {
                 return true;
             }
         }).then(res => {
-
+            console.log(res);
         }).catch(error => {
             if (error.response) {
                 // The request was made and the server responded with a status code
@@ -31,6 +31,12 @@ const helpers = {
               }
               console.log(error.config);  
         });
+    },
+    getCookies: () => {
+        return axios.get('/api')
+        .then(res => {
+            console.log(res);
+        })
     },
     getStudents: () => {
         return axios.get('/api/students')
@@ -121,9 +127,6 @@ const helpers = {
               }
               console.log(error.config); 
         });
-    },
-    logoutUser: () => {
-        return axios.post('/api/logout');
     }
     // loginUser: user => {
     //     return axios.post('/api/login', {

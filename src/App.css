@@ -1,175 +1,229 @@
+html, body {
+  	font-family: 'Palanquin', Arial, sans-serif;
+}
 
+/******************************** Font Styling Classes ********************************/
+.bold {
+	font-weight: 700;
+}
 
+/******************************** CSS Transitions ********************************/
+.fade-enter {
+	opacity: 0;
+	z-index: 1;
+}
+
+.fade-enter-active {
+	opacity: 1;
+	transition: opacity 250ms ease-in;
+}
+.fade-exit {
+	opacity: 0;
+}
+/* .fade-exit-active {
+	opacity: 0;
+	transition: opacity 250ms ease-in;
+} */
 .App {
-  text-align: left;
+	text-align: left;
 }
 
 .App-logo {
-  /* animation: App-logo-spin infinite 20s linear; */
-  height: 70px;
+  	/* animation: App-logo-spin infinite 20s linear; */
+	height: 70px;
 }
 
 .App-header {
-  height: 125px;
-  padding: 15px;
-  color: white;
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  background-color: rgb(0, 0, 0.39);
+	height: 125px;
+	padding: 15px;
+	color: white;
+	display: flex;
+	flex-flow: row nowrap;
+	align-items: center;
+	background-color: rgb(0, 0, 0.39);
 }
 
 .App-header * {
-  margin: 5px;
+	margin: 5px;
 }
 
 .App-title {
-  font-size: 1.5em;
-  padding-top: 5px;
+	font-size: 1.5em;
+	padding-top: 5px;
 }
 
 .App-intro {
-  font-size: large;
+	font-size: large;
 }
 #view {
-  grid-area: view;
-  display: grid;
+	grid-area: view;
+	display: grid;
 }
 #main {
-  display: grid;
-  grid-template-columns: [dashboard] 1fr [view] 6fr;
-  grid-template-rows: auto;
+	display: grid;
+	grid-template-columns: [dashboard] minmax(180px, 1fr) [view] 6fr;
+	grid-template-rows: auto;
+}
+#navBrand {
+	padding: 15px;
+}
+#navBrand img {
+	display: block;
+	margin: 0 auto;
+}
+/******************************** Login/Sign Up ********************************/
+
+#login-signup-prompt{
+	height: 100vh;
+	display: grid;
+	grid-template-columns: 1fr [middle] 3fr 1fr;
+	grid-template-rows: 1fr [middle] 3fr 1fr;
+	/* background-color: #243B4A; */
+	/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#f5f7fa+0,bac3d6+100 */
+	background: #f5f7fa; /* Old browsers */
+	/* IE9 SVG, needs conditional override of 'filter' to 'none' */
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICA8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjZjVmN2ZhIiBzdG9wLW9wYWNpdHk9IjEiLz4KICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2JhYzNkNiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgPC9saW5lYXJHcmFkaWVudD4KICA8cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMSIgaGVpZ2h0PSIxIiBmaWxsPSJ1cmwoI2dyYWQtdWNnZy1nZW5lcmF0ZWQpIiAvPgo8L3N2Zz4=);
+	background: -moz-linear-gradient(-45deg, #f5f7fa 0%, #bac3d6 100%); /* FF3.6-15 */
+	background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,#f5f7fa), color-stop(100%,#bac3d6)); /* Chrome4-9,Safari4-5 */
+	background: -webkit-linear-gradient(-45deg, #f5f7fa 0%,#bac3d6 100%); /* Chrome10-25,Safari5.1-6 */
+	background: -o-linear-gradient(-45deg, #f5f7fa 0%,#bac3d6 100%); /* Opera 11.10-11.50 */
+	background: -ms-linear-gradient(-45deg, #f5f7fa 0%,#bac3d6 100%); /* IE10 preview */
+	background: linear-gradient(135deg, #f5f7fa 0%,#bac3d6 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f5f7fa', endColorstr='#bac3d6',GradientType=1 ); /* IE6-8 fallback on horizontal gradient */
 }
 
-/******************************** Login/Sign Up ********************************/
-#login-signup-prompt{
-  height: 100vh;
-  display: grid;
-  grid-template-columns: 1fr [middle] 3fr 1fr;
-  grid-template-rows: 1fr [middle] 3fr 1fr;
-  background-color: #243B4A;
-}
 #loginOrSignup {
-  grid-area: middle;
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: center;
-  align-content: center;
-  padding: 30px;
-  border: solid 2px #e8e8e8;
-  border-radius: 15px;
-  -webkit-border-radius: 15px;
-  -moz-border-radius: 15px;
-  -ms-border-radius: 15px;
-  -o-border-radius: 15px;
-  background-color: #FFFFFF;
-  box-shadow: 0px 0px 11px #222;
+	grid-area: middle;
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: center;
+	align-content: center;
+	padding: 30px;
+	/* border: solid 2px #e8e8e8; */
+	border-radius: 15px;
+	-webkit-border-radius: 15px;
+	-moz-border-radius: 15px;
+	-ms-border-radius: 15px;
+	-o-border-radius: 15px;
+	/* background-color: #FFFFFF; */
+	/* box-shadow: 0px 0px 11px #222; */
 }
 #loginOrSignup > h1 {
-  margin: 0px 0px 25px;
-  text-align: center;
+	margin: 0px 0px 25px;
+	text-align: center;
 }
 #btnWrapper {
-  display: block;
-  margin: 0 auto;
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: center;
 }
 #btnWrapper button {
-  text-transform: uppercase;
-  font-size: 1.15rem;
-  margin: 0px 5px;
-  padding: 0.65rem 1.75rem;
-  border-radius:  1.5rem;
-  -webkit-border-radius:  1.5rem;
-  -moz-border-radius:  1.5rem;
-  -ms-border-radius:  1.5rem;
-  -o-border-radius:  1.5rem;
+	text-transform: uppercase;
+	font-size: 1.15rem;
+	margin: 0px 5px;
+	padding: 0.65rem 1.75rem;
+	border-radius:  1.5rem;
+	-webkit-border-radius:  1.5rem;
+	-moz-border-radius:  1.5rem;
+	-ms-border-radius:  1.5rem;
+	-o-border-radius:  1.5rem;
+	min-width: 125px; 
 }
 .btnFormWrapper button {
-  margin: 5px;
-  text-transform: uppercase;
-  padding: 0.65rem 1.75rem;
+	margin: 5px;
+	text-transform: uppercase;
+	padding: 0.65rem 1.75rem;
 }
 .btnFormWrapper button:hover {
-  color: #FFFFFF;
-  background-color: #707070;
+	color: #FFFFFF;
+	background-color: #707070;
 } 
 #loginForm, #signupForm {
-  grid-area: middle;
-  padding: 30px;
-  border: solid 2px #e8e8e8;
-  border-radius: 15px;
-  -webkit-border-radius: 15px;
-  -moz-border-radius: 15px;
-  -ms-border-radius: 15px;
-  -o-border-radius: 15px;
-  background-color: #FFFFFF;
-  box-shadow: 0px 0px 11px #222;
+	grid-area: middle;
+	padding: 30px;
+	/* border: solid 2px #e8e8e8; */
+	border-radius: 15px;
+	-webkit-border-radius: 15px;
+	-moz-border-radius: 15px;
+	-ms-border-radius: 15px;
+	-o-border-radius: 15px;
+	/* background-color: #FFFFFF; */
 }
 #loginForm form {
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: center;
-  margin-top: 100px;
-  text-align: left;
-  padding: 1em 5em;
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: center;
+	margin-top: 100px;
+	text-align: left;
+	padding: 1em 5em;
 }
 #signupForm form {
-
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: center;
-  text-align: left;
-  padding: 1em 5em;
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: center;
+	text-align: left;
+	padding: 1em 5em;
 }
 .formTitle {
-  margin-bottom: 1.5rem;
+	margin-bottom: 1.5rem;
 }
 /******************************** Dashboard ********************************/
 #dashboard {
-  /* width: 15%;
-  min-width: 150px; */
-  grid-area: dashboard;
-  min-height: 100vh;
-  height: 100%;
-  background-color: #222;
-  overflow: hidden;
+	/* width: 15%;
+	min-width: 150px; */
+	grid-area: dashboard;
+	min-height: 100vh;
+	height: 100%;
+	background-color: #222;
+	overflow: hidden;
 }
 #dashboardLinks {
-  list-style-type: none;
-  text-align:left;
-  padding-left: 0;
+	list-style-type: none;
+	text-align:left;
+	padding-left: 0;
 }
 #dashboardLinks li {
-  color: white;
-  padding: 15px;
-  background-color: #222222;
-  transition: all 0.1s ease-in;
-  -webkit-transition: all 0.1s ease-in;
-  -moz-transition: all 0.1s ease-in;
-  -ms-transition: all 0.1s ease-in;
-  -o-transition: all 0.1s ease-in;
+	background-color: #222222;
+	transition: all 0.1s ease-in;
+	-webkit-transition: all 0.1s ease-in;
+	-moz-transition: all 0.1s ease-in;
+	-ms-transition: all 0.1s ease-in;
+	-o-transition: all 0.1s ease-in;
+}
+#dashboardLinks a {
+	color: white;
+	width: 100%;
+	height: 100%;
+	display: block;
+	padding: 1em 2em;
 }
 #dashboardLinks li:hover {
-  background-color: rgb(46, 46, 46);
+	background-color: rgb(46, 46, 46);
 }
 #dashboardLinks a:hover {
-  text-decoration: none;
+	text-decoration: none;
+}
+.selected {
+	background-color: rgb(46, 46, 46);
+}
+/******************************** Home ********************************/
+.page {
+
 }
 
-/******************************** Home ********************************/
 #home {
-  text-align: left;
+	text-align: left;
 }
 .page-title, .subtitle {
-  padding: 30px 15px 15px 30px;
+  	padding: 30px 15px 15px 30px;
 }
 
-.studentWrapper {
-  display: flex;
-  flex-flow: column nowrap;
-  margin: 15px 0px;
+.studentItem, .teacherItem {
+	display: flex;
+	flex-flow: column nowrap;
+	margin: 15px 0px;
 }
-.studentWrapper p {
-  margin-bottom: 0rem;
-  padding: 0px;
+.studentItem p, .teacherItem p {
+	margin-bottom: 0rem;
+	padding: 0px;
 }

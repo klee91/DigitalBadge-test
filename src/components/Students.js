@@ -18,19 +18,22 @@ class Students extends Component {
     }
     render() {
         return(
-            <div>
-                <h1>Students:</h1>
-                <div>
-                    { this.state.students.length !== undefined ? 
+            <div className="page" id="students">
+                <h1 className="page-title">Students Directory</h1>
+                <hr />
+                <section className="directory" id="studentDirectory">
+                    { this.state.students === undefined ? 
+                        <h2>No students found</h2>
+                        :
                         this.state.students.map((student, i) => 
-                            <div className="studentWrapper" key={i}>
+                            <div className="studentItem" key={i}>
                                 <p>First Name: {student.firstName}</p>
                                 <p>Last Name: {student.lastName}</p>
                                 <p>Email: {student.email}</p>
                             </div>
-                        ) : console.log('no students')
+                        )
                     }
-                </div>
+                </section>
             </div>
         )
     }

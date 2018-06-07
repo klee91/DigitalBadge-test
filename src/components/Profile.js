@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import cookies from 'react-cookie';
-import helpers from '../utils/helpers.js';
+// import helpers from '../utils/helpers.js';
 class Profile extends Component {
     constructor(props) {
         super(props);
@@ -18,13 +18,15 @@ class Profile extends Component {
                 user: this.props.user
             });
         }
-
     }
     render() {
         return(
-            <div id="profile">
-                Profiles
-                <div>{this.state.userId}</div>
+            <div className="page" id="profile">
+                <h1 className="page-title">Your Profile</h1>
+                <hr />
+                <section>
+                    {/* <h3 className="subtitle"></h3> */}
+                </section>
             </div>
         )
     }

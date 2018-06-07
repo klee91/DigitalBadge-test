@@ -3,8 +3,11 @@ import React, {Component} from 'react';
 class BadgePage extends Component {
     render() {
         return(
-            <div id="badgesPage">
-                Badges
+            <div className="page" id="badgesPage">
+                <h1 className="page-title">Badges</h1>
+                <hr />
+                <section>
+                </section>
             </div>
         )
     }
