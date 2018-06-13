@@ -4,29 +4,66 @@ const router = express.Router();
 
 const StudentData = require("../src/models/StudentSchema.js");
 const TeacherData = require("../src/models/TeacherSchema.js");
-const VerifyToken = require('../auth/VerifyToken.js');
 const bcrypt = require('bcryptjs');
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
 const jwt = require('jsonwebtoken');
 const config = require('../config.js');
-require('../auth/passport.js');
-const store = require('store');
 const cookieParser = require('cookie-parser');
 
-// const Promise = require('promise');
-// if (typeof localStorage === "undefined" || localStorage === null) {
-//     const LocalStorage = require('node-localstorage').LocalStorage;
-//     localStorage = new LocalStorage('./scratch');
-// }
+// const VerifyToken = require('../auth/VerifyToken.js');
+// const passport = require('passport');
+// const LocalStrategy = require('passport-local').Strategy;
+// const passportJWT = require("passport-jwt");
+// const JWTStrategy = passportJWT.Strategy;
+// const ExtractJWT = passportJWT.ExtractJwt;
+// require('../auth/passport.js');
+
+
+const studentQuery = (user,req,res) => {
+    let newuser = user;
+    StudentData.findOne({email : newuser.loginemail}, (err,student) => {
+        console.log('student: ' + student);
+        if (err) { return err; 
+        } else if (student === null) {
+            teacherQuery(newuser,req,res);
+        } else if (student) {
+            pwCompare(newuser.loginpassword, student, 's',req,res);
+        }
+    })
+}
+
+const teacherQuery = (user,req,res) => {
+    let newuser = user;
+    TeacherData.findOne({email: newuser.loginemail}, (err,teacher) => {
+        if (err) { return err; }
+        pwCompare(newuser.loginpassword, teacher, 't',req,res);
+    })
+}
+
+const pwCompare = (password, user, type, req, res) => {
+    // MATCH PASSWORD WITH DATABASE PASSWORD
+    //*****MUST BCRYPT COMPARE THE DATABASE HASHED PASSWORD TO MATCH WITH THE INPUTTED PASSWORD******
+    let pw = user.password;
+    let uid = user._id;
+    let passwordIsValid = bcrypt.compareSync(password, pw);
+
+    if (passwordIsValid) {
+        //CREATE TOKEN IF PASSWORD IS STILL VALID
+        let token= jwt.sign({id: uid}, config.OREO, {
+            expiresIn: 86400 //expires in 24 hours
+        });
+
+        //RUN TOKEN ON SUCCESS FUNCTION
+        tokenSuccess(req,res,token,user,type);
+    } else {
+        return res.status(401).send({auth: false, token: null});
+    }
+}
 
 //once token is successfully retrieved, store to cookie
-const tokenSuccess = (req,res,next,token,user,type) => {
+const tokenSuccess = (req,res,token,user,type) => {
     //set access token or 'act'
-    console.log(user);
-
     let cookie = req.cookies.act;
-    let cookieUser = user._id;
+    let cookieUser = req.cookies.user_id;
     if (cookie === undefined || cookieUser === undefined){
         // no: set a new cookie
         res.cookie('act', token, { maxAge: 900000, httpOnly: false, signed: true});
@@ -51,11 +88,149 @@ const tokenSuccess = (req,res,next,token,user,type) => {
 
 //base route
 router.get('/', (req, res) => {
-    // Cookies that have been signed
-    console.log('Signed Cookies: ', req.signedCookies);
     res.json({ message: 'API Initialized!'});
 });
 
+//login route
+router.post('/login', (req, res, next) => {
+    let user = req.body.user;
+    studentQuery(user,req,res);
+
+    // passport.authenticate('local', () => {
+    //     res.redirect('http://localhost:3001/home');
+    // });
+    // res.redirect('http://localhost:3001/home');
+    // passport.authenticate('local', {session: false}, (err, user, info) => {
+    //     if (err || !user) {
+    //         return res.status(400).json({
+    //             message: 'something is not right',
+    //             user : user
+    //         })
+    //     }
+
+    //     req.login(user, {session: false}, (err) => {
+    //         if(err) {
+    //             res.send(err);
+    //         }
+    //         return res.json({user, token});
+    //     });
+    // })(req,res);
+});
+
+//signup route
+router.post('/signup', (req,res,next) => {
+    console.log(req.body.user);
+    let user = req.body.user;
+    // generate salt
+    let salt = bcrypt.genSaltSync(10);
+    // hash password
+    let hash = bcrypt.hashSync(user.password, salt);
+    // if 'Student' is checked in form, create student in DB
+    if (user.isStudent) {
+        console.log('student create');
+        StudentData.create({
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            password: hash
+        }, function(error,student) {
+            if(error) {
+                console.log(error);
+            } else {
+                console.log(student);
+            }
+            // create a token
+            let token = jwt.sign({ id: student._id }, config.OREO, {
+                expiresIn: 86400 // expires in 24 hours
+            });
+            tokenSuccess(req,res,token,student,'s');
+        });
+    // if 'Teacher' is checked in form, create teacher in DB
+    } else if (user.isTeacher) {
+        console.log('teacher create');
+        TeacherData.create({
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            password: hash
+        }, function(error,teacher) {
+            if (error) {return res.status(500).send("There was a problem registering the user...");}
+
+            // create a token
+            let token = jwt.sign({ id: teacher._id }, config.OREO, {
+                expiresIn: 86400 // expires in 24 hours
+            });
+            tokenSuccess(req,res,token,teacher,'t');
+            // res.status(200).send({ auth: true, token: token });
+        });
+    } else {
+        console.log("Please select either student or teacher");
+    }
+    
+});
+
+//logout route
+router.post('/logout', (req,res) => {
+    // req.logOut();
+    res.clearCookie('act');
+    res.clearCookie('user_id');
+    res.clearCookie('type');
+    // ****RELOAD PAGE OR REDIRECT TO HOME PAGE CORRECTLY
+    res.redirect('/');
+});
+
+//get all students
+router.get('/students', (req,res) => {
+    // let tokenFromHeader = req.cookies.act;
+    // console.log("REQ: " + JSON.stringify(req.cookies));
+    // jwt.verify(tokenFromHeader, config.OREO, function(err, decoded) {
+    //     if (err) {
+    //         return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+    //     }
+    //     // if everything good, save to request for use in other routes
+    //     req.userId = decoded.id;
+    //     StudentData.find()
+    //     .then((students) => {
+    //         res.json(students);
+    //         console.log(students);
+    //     });
+    //     next();
+    // });
+    StudentData.find()
+    .then((students) => {
+        res.json(students);
+        console.log(students);
+    });
+});
+
+//get student by ID
+router.get('/students/:studentId', (req,res) => {
+
+    StudentData.findById(req.params.studentId).then((student) => {
+        res.json(student);
+        console.log(student);
+    });
+});
+
+//get all teachers
+router.get('/teachers', (req,res) => {
+    TeacherData.find()
+    .then((data) => {
+        res.json(data);
+        console.log(data);
+    });
+});
+
+//get teacher by ID
+router.get('/teachers/:teacherId', (req,res) => {
+    console.log(req.params.teacherId);
+    TeacherData.find({
+        "teacherId" : parseInt(req.params.teacherId)
+    }).then((data) => {
+         res.json(data);
+        console.log(data);
+    });
+});
 
 //user specific route
 // router.get('/student/me', VerifyToken, (req,res, next) => {
@@ -96,211 +271,56 @@ router.get('/', (req, res) => {
 //     // });
 // }
 
-//login route
-router.post('/login',
-// passport.authenticate('local', {session: true, successRedirect: '/home', failureRedirect:'/', failureFlash: true}, 
-(req, res, next) => {
-    // let token = req.signedCookies.act;
+// ============================================ route login old logic ========================================================
+// let token = req.signedCookies.act;
     // let cookieUser = req.signedCookies.user_id;
     // req.headers['x-access-token'] = req.cookies.act;
     // console.log(cookieUser);
-    console.log(req.body);
+
     // GET CREDENTIALS
-    let email = req.body.user.loginemail;
-    let password = req.body.user.loginpassword;
+    // let email = req.body.user.loginemail;
+    // let password = req.body.user.loginpassword;
+
     // parameter declarations for user type view
-    let pw, uid, type;
+    // let pw, uid, type;
+    
     //mongoDB database student query by email
-    StudentData.findOne({
-        email: email
-    }, (err,student) => {
+    // StudentData.findOne({
+    //     email: email
+    // }, (err,student) => {
         
-        if (student) {
-            uid = student._id;
-            pw = student.password;
-            type = 's';
-        }
+    //     if (student) {
+    //         pwCompare(password, student.password, student, 's',student._id,req,res);
+    //     }
 
-        //ERROR HANDLER
-        if (err) {
-            return res.status(500).send('Error on the server.');
-        } else if (student === null) {
-            console.log('not found in student collection');
-            //mongoDB database teacher query by email
-            TeacherData.findOne({
-                email: email
-            }, (err,teacher) => {
-
-                if (teacher) {
-                    uid = teacher._id;
-                    pw = teacher.password;
-                    type = 't';
-                }
-
-                if (err) {
-                    return res.status(500).send('Error on the server.');
-                } else if (teacher === null) {
-                    return res.send('User not found');
-                }
-            })
-        }
-
-        // MATCH PASSWORD WITH DATABASE PASSWORD
-        //*****MUST BCRYPT COMPARE THE DATABASE HASHED PASSWORD TO MATCH WITH THE INPUTTED PASSWORD******
-        let passwordIsValid = bcrypt.compareSync(password, pw);
-        if (passwordIsValid) {
-            //CREATE TOKEN IF PASSWORD IS STILL VALID
-            let token= jwt.sign({id: uid}, config.OREO, {
-                expiresIn: 86400 //expires in 24 hours
-            });
-
-            //RUN TOKEN ON SUCCESS FUNCTION
-            tokenSuccess(req,res,next,token,student,type);
-        } else {
-            return res.status(401).send({auth: false, token: null});
-        }
-    })
-    //mongoDB database teacher query
-    // TeacherData.findOne({
-    //     loginemail: email,
-    //     loginpassword: password
-    // }, function(err,teacher) {
+    //     //ERROR HANDLER
     //     if (err) {
     //         return res.status(500).send('Error on the server.');
-    //     } else if (teacher === null) {
-    //         return "teacher not found";
+    //     } else if (student === null) {
+    //         console.log('not found in student collection');
+    //         //mongoDB database teacher query by email
+    //         TeacherData.findOne({
+    //             email: email
+    //         }, (err,teacher) => {
+    //             console.log("error: " + err);
+    //             console.log(teacher);
+    //             if (teacher) {
+    //                 pwCompare(password, teacher.password, teacher, 't', teacher._id,req,res);
+    //             }
+
+    //             if (err) {
+    //                 return res.status(500).send('Error on the server.');
+    //             } else if (teacher === null) {
+    //                 return res.send('User not found');
+    //             }
+    //         })
     //     }
 
-    //     let passwordIsValid = bcrypt.compare(password, student.password);
-    //     if(!passwordIsValid) return res.status(401).send({auth: false, token: null});
-
-    //     let token= jwt.sign({id: teacher._id}, config.OREO, {
-    //         expiresIn: 86400 //expires in 24 hours
-    //     });
-    //     tokenSuccess(req,res,next,token,teacher);
-    //     res.status(200).send({auth: true, token: token});
     // })
-})
-// )
-;
 
-//signup route
-router.post('/signup', (req,res,next) => {
-    console.log(req.body.user);
-    let user = req.body.user;
-    // generate salt
-    let salt = bcrypt.genSaltSync(10);
-    console.log(salt);
-    // hash password
-    let hash = bcrypt.hashSync(user.password, salt);
-    console.log(hash);
+// ============================================ END route login old logic ========================================================
 
-    // if student is checked in form, create student in DB
-    if (user.isStudent) {
-        console.log('student create');
-        StudentData.create({
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-            password: hash
-        }, function(error,student) {
-            if(error) {
-                console.log(error);
-            } else {
-                console.log(student);
-            }
-            // create a token
-            let token = jwt.sign({ id: student._id }, config.OREO, {
-                expiresIn: 86400 // expires in 24 hours
-            });
-            tokenSuccess(req,res,next,token,student);
-            // req.flash('success_msg', "You have successfully registered.");
-        });
-    // if teacher is checked in form, create teacher in DB
-    } else if (user.isTeacher) {
-        console.log('teacher create');
-        TeacherData.create({
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-            password: hash
-        }, function(error,teacher) {
-            if (error) {return res.status(500).send("There was a problem registering the user...");}
 
-            // create a token
-            let token = jwt.sign({ id: teacher._id }, config.OREO, {
-                expiresIn: 86400 // expires in 24 hours
-            });
-            tokenSuccess(req,res,next,token,teacher);
-            // res.status(200).send({ auth: true, token: token });
-        });
-    } else {
-        console.log("Please select either student or teacher");
-    }
-    
-});
-
-//logout route
-router.post('/logout', (req,res) => {
-    // res.status(200).send({auth:false, token:null});
-    // res.redirect('/');
-    req.logOut();
-    res.clearCookie('act');
-    res.clearCookie('user_id');
-    res.clearCookie('type');
-    // ****RELOAD PAGE OR REDIRECT TO HOME PAGE CORRECTLY
-    res.redirect('/');
-});
-
-//get all students
-router.get('/students', (req,res) => {
-    // jwt.verify(token, config.OREO, function(err, decoded) {
-    //     if (err) {
-    //         return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
-    //     }
-    //     // if everything good, save to request for use in other routes
-    //     req.userId = decoded.id;
-    // });
-    StudentData.find()
-    .then((students) => {
-        res.json(students);
-        console.log(students);
-    });
-});
-
-//get student by ID
-router.get('/students/:studentId', passport.authenticate('jwt'), (req,res) => {
-    StudentData.find({
-        "studentId" : parseInt(req.params.studentId)
-    })
-    .then((data) => {
-         res.json(data);
-        console.log(data);
-    });
-});
-
-//get all teachers
-router.get('/teachers', 
-// passport.authenticate('jwt'), 
-(req,res) => {
-    TeacherData.find()
-    .then((data) => {
-        res.json(data);
-        console.log(data);
-    });
-});
-
-//get teacher by ID
-router.get('/teachers/:teacherId', passport.authenticate('jwt'), (req,res) => {
-    console.log(req.params.teacherId);
-    TeacherData.find({
-        "teacherId" : parseInt(req.params.teacherId)
-    })
-    .then((data) => {
-         res.json(data);
-        console.log(data);
-    });
-});
 
 // router.get('/get-data', function(req,res) {
 //     StudentData.find()

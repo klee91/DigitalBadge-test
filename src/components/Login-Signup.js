@@ -67,14 +67,9 @@ export default class LoginSignup extends Component {
             loginemail: this.state.loginemail,
             loginpassword: this.state.loginpassword
         };
-
+        
         axios.post('/api/login', {
             user,
-            // headers:{
-            //     'Content-Type' : 'application/x-www-form-urlencoded'
-            //     // 'x-access-token' : cookies.load('act'),
-            // },
-            // Cookie: "act=" + act,
             withCredentials: true,
             validateStatus: status => {
                 return true;

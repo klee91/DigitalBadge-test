@@ -61,8 +61,8 @@ const helpers = {
               console.log(error.config); 
         });
     },
-    getStudent: () => {
-        return axios.get('/api/student/me', (error, student) => {
+    getStudent: (studentid) => {
+        return axios.get(`/api/students/${studentid}`, (error, student) => {
             return student;
         }).catch(error => {
             if (error.response) {

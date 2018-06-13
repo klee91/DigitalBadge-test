@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import { NavLink } from 'react-router-dom';
 import axios from 'axios';
-import logo from '../assets/img/db-logo-prototype.png';
+import logo from '../../assets/img/db-logo-prototype.png';
 // Main Dashboard after initial login
 // Depending on teacher or student, will render different links
 export default class Dashboard extends Component {

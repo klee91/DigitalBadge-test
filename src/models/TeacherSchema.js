@@ -1,4 +1,5 @@
-let mongoose = require('mongoose');
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 let TeacherSchema = mongoose.Schema ({
     firstName: {
@@ -45,3 +46,10 @@ let TeacherSchema = mongoose.Schema ({
 });
 
 let Teacher = module.exports = mongoose.model('Teacher', TeacherSchema);
+
+module.exports.comparePassword = function(loginPassword, hash, callback){
+	bcrypt.compareSync(loginPassword, hash, function(err, isMatch) {
+    	if(err) throw err;
+    	callback(null, isMatch);
+	});
+}

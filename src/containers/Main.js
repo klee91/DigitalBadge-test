@@ -1,41 +1,51 @@
 import React, {Component} from 'react';
 import { Switch, Route} from 'react-router-dom';
-import Dashboard from './Dashboard';
-import Profile from './Profile';
+import Dashboard from '../components/Accessories/Dashboard';
+import Profile from '../components/Pages/Profile';
 import BadgePage from './BadgePage';
-import Home from './Home';
-import Students from "./Students";
-import Teachers from "./Teachers";
+import Home from '../components/Pages/Home';
+import Students from "../components/Pages/Students";
+// import Student from '../components/Items/Student';
+import Teachers from "../components/Pages/Teachers";
+import cookies from 'react-cookie';
 import {TransitionGroup, CSSTransition} from 'react-transition-group';
 // import cookies from 'react-cookies';
 // import helpers from '../utils/helpers.js'
 // import logo from '../assets/img/db-logo-prototype.png';
-// The Main component renders one of the three provided
-// Routes (provided that one matches). Both the /profile
-// and /badges routes will match any pathname that starts
-// with /profile or /badges. The / route will only match
-// when the pathname is exactly the string "/"
+import { connect } from 'react-redux';
+import { bindActionCreators} from 'redux'; 
+import { fetchUser } from '../actions/index';
+
 export default class Main extends Component {
   constructor(props) {
     super(props)
     this.state = {
       isAuthenticated: false,
       isStudent: false,
-	  isTeacher: false,
-	  user: {}
-    }
+	  	isTeacher: false,
+	  	user: {}
+		}
     this.stateLogout = this.stateLogout.bind(this);
   }
   componentWillMount() {
-	console.log(this.props.user);
+	// console.log(this.props.user);
+	let typeCookie = cookies.load('type');
+
+	//-----------------------------------------------------------------------------------------------------------------------
+	//this needs fixing. make sure isStudent/isTeacher is being set in the App.js so it is passed properly to this component
+	//-----------------------------------------------------------------------------------------------------------------------
 	if(this.props.user.isStudent) {
 		this.setState({isStudent: true, isTeacher: false});
-	  } else if(this.props.user.isTeacher){
+	} else if(this.props.user.isTeacher){
 		this.setState({isTeacher: true, isStudent: false});
-	  }
-  }
-  componentDidMount() {
-	  console.log(this.props.user.isAuthenticated);
+	}
+
+	if (typeCookie === 's') {
+		this.setState({isStudent: true, isTeacher: false});
+	} else if (typeCookie === 't') {
+		this.setState({isTeacher: true, isStudent: false});
+	}
+	
   }
   stateLogout() {
     this.setState({
@@ -61,6 +71,7 @@ export default class Main extends Component {
 						<Route path='/home/profile' component={Profile}/>
 						<Route path='/home/badges' component={BadgePage}/>
 						{this.state.isStudent ? <Route path='/home/students' component={Students}/> : <Route path='/home/teachers' component={Teachers}/> }
+						{/* <Route path="/home/students/:studentid" component={Student} /> */}
 						<Route path ='/logout'/>
 					</Switch>
 				</CSSTransition>
@@ -71,3 +82,15 @@ export default class Main extends Component {
     )
  }
 }
+
+// function mapStateToProps(state) {
+// 	return {
+// 		user: state.user
+// 	};
+// }
+
+// function mapDispatchToProps(dispatch) {
+// 	return bindActionCreators({fetchUser: fetchUser},dispatch)
+// }
+
+// export default connect(mapStateToProps, mapDispatchToProps)(Main);
